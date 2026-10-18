@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Casement Draft</title>
+<style>
+:root{--bg:#f3f4f6;--panel:#fff;--text:#111827;--muted:#6b7280;--accent:#2563eb;--act:#fff;--bd:#cbd5e1;--cv:#fafafa;--gm:#e8ebef;--gM:#cbd5e1;--ff:#cfd8e3;--fl:#1f2937;--gl:#dbeafe;--sn:#e11d48;--dm:#047857;--er:#dc2626}
+[data-theme=dark]{--bg:#111418;--panel:#1b2027;--text:#e5e7eb;--muted:#9ca3af;--accent:#3b82f6;--bd:#374151;--cv:#14181d;--gm:#232a33;--gM:#36404d;--ff:#4b5563;--fl:#e5e7eb;--gl:#1e3a5f;--sn:#fb7185;--dm:#34d399;--er:#f87171}
+[data-theme=midnight]{--bg:#0a1330;--panel:#101c44;--text:#dbe7ff;--muted:#8fa6d6;--accent:#5aa2ff;--act:#04122e;--bd:#24367a;--cv:#08102a;--gm:#14214d;--gM:#263a7a;--ff:#3b5a9f;--fl:#bcd4ff;--gl:#12306b;--sn:#ffd166;--dm:#5eead4;--er:#ff8a8a}
+[data-theme=graphite]{--bg:#2b2d30;--panel:#35383c;--text:#e8e8e8;--muted:#a0a3a8;--accent:#f59e0b;--act:#111;--bd:#50545a;--cv:#26282b;--gm:#34373b;--gM:#4a4e54;--ff:#6b7078;--fl:#f1f1f1;--gl:#3a4650;--sn:#ff5c8a;--dm:#7dd3fc;--er:#ff8a8a}
+[data-theme=forest]{--bg:#e8f0e6;--panel:#f6faf4;--text:#14301c;--muted:#4f6b57;--accent:#2f7d44;--bd:#b3c9b6;--cv:#f1f7ef;--gm:#dbe8d8;--gM:#b5cfb4;--ff:#a8c9a0;--fl:#1b4d2a;--gl:#d9efe0;--sn:#c2410c;--dm:#1d4ed8}
+[data-theme=sand]{--bg:#f1e7d6;--panel:#faf3e6;--text:#3b2a1a;--muted:#7a6650;--accent:#b45309;--bd:#d6c4a5;--cv:#fbf5ea;--gm:#eadfc9;--gM:#d9c7a4;--ff:#e0c9a0;--fl:#5b3a1a;--gl:#f5ead2;--sn:#be123c;--dm:#0f766e}
+[data-theme=contrast]{--bg:#000;--panel:#000;--text:#fff;--muted:#ddd;--accent:#ff0;--act:#000;--bd:#fff;--cv:#000;--gm:#2e2e2e;--gM:#777;--ff:#262626;--fl:#fff;--gl:#000;--sn:#f0f;--dm:#0f6;--er:#ff6b6b}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none}
+body{height:100dvh;position:fixed;inset:0;display:flex;flex-direction:column;gap:4px;padding:max(4px,env(safe-area-inset-top)) max(6px,env(safe-area-inset-right)) max(4px,env(safe-area-inset-bottom)) max(6px,env(safe-area-inset-left));background:var(--bg);color:var(--text);font:14px/1.2 system-ui,sans-serif;-webkit-user-select:none;user-select:none}
+header{display:flex;align-items:center;justify-content:space-between}
+h1{margin:0;font-size:17px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+label{display:flex;flex-direction:column;gap:2px;font-size:12px;color:var(--muted);min-width:0}
+.inl label{flex-direction:row;align-items:center;gap:6px}
+.inl span{white-space:nowrap}
+input{width:100%;min-width:0;height:30px;padding:0 8px;font-size:15px;border:1px solid var(--bd);border-radius:6px;background:var(--panel);color:var(--text)}
+input:focus{outline:2px solid var(--accent)}
+.btn{height:32px;padding:0 10px;border:1px solid var(--bd);border-radius:6px;background:var(--panel);color:var(--text);font-size:13px;cursor:pointer;touch-action:manipulation}
+.btn.on{background:var(--accent);color:var(--act);border-color:var(--accent);font-weight:700}
+.btn:disabled{opacity:.4;cursor:default}
+.tb{display:flex;gap:4px}.tb .btn{flex:1;padding:0 2px}
+#err{display:none;color:var(--er);font-size:12px;font-weight:600}
+#cv{position:relative;flex:1;min-height:0;border:1px solid var(--bd);border-radius:6px;overflow:hidden;touch-action:none}
+#svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+#svg .w *{vector-effect:non-scaling-stroke}
+#hud{position:absolute;left:6px;top:6px;padding:3px 7px;border-radius:5px;background:var(--panel);border:1px solid var(--bd);font-size:12px;display:none;pointer-events:none;max-width:75%}
+.zc{position:absolute;right:6px;bottom:6px;display:flex;flex-direction:column;gap:4px}
+.zc .btn{width:36px;height:34px;padding:0}
+#set{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:9}
+#set.open{display:flex}
+.card{background:var(--panel);color:var(--text);border:1px solid var(--bd);border-radius:10px;padding:14px;width:min(320px,92vw);max-height:90dvh;overflow:auto}
+.card h2{margin:0 0 8px;font-size:15px}.card h3{margin:10px 0 6px;font-size:12px;color:var(--muted);text-transform:uppercase}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.opts .btn{display:flex;align-items:center;gap:6px;justify-content:flex-start}
+.dot{width:14px;height:14px;border-radius:50%;border:1px solid #888;flex:none}
+</style>
+</head>
+<body>
+<header><h1>Casement Draft</h1><button class="btn" id="bSet">Settings</button></header>
+<section class="g2"><label>Height <i id="uH"></i><input id="iH" inputmode="decimal" autocomplete="off"></label><label>Width <i id="uW"></i><input id="iW" inputmode="decimal" autocomplete="off"></label></section>
+<section class="g2"><label>Column<input id="iC" inputmode="numeric" autocomplete="off"></label><label>Row<input id="iR" inputmode="numeric" autocomplete="off"></label></section>
+<section class="g2 inl"><label><span>Frame Width <i id="uF"></i></span><input id="iF" inputmode="decimal" autocomplete="off"></label><label><span>Middle Frame Width <i id="uM"></i></span><input id="iM" inputmode="decimal" autocomplete="off"></label></section>
+<div id="err" role="alert"></div>
+<nav class="tb"><button class="btn" id="bDim">Dimensions</button><button class="btn" id="bReset">Reset</button><button class="btn" id="bUndo">Undo</button><button class="btn" id="bRedo">Redo</button><button class="btn" id="bPolar">Polar OFF</button></nav>
+<main id="cv"><svg id="svg" xmlns="http://www.w3.org/2000/svg"></svg><div id="hud"></div>
+<div class="zc"><button class="btn" id="zIn" aria-label="Zoom in">+</button><button class="btn" id="zOut" aria-label="Zoom out">−</button><button class="btn" id="zFit" aria-label="Fit to screen">Fit</button></div></main>
+<div id="set"><div class="card"><h2>Settings</h2><h3>Units</h3><div class="opts" id="uOpts"></div><h3>Theme</h3><div class="opts" id="tOpts"></div><div style="margin-top:12px;text-align:right"><button class="btn" id="bClose">Close</button></div></div></div>
+
+<script>
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id);
+const DEF={W:48,H:72,F:2,M:2,C:2,R:1};
+const THEMES=[['light','Light','#ffffff'],['dark','Dark','#111418'],['midnight','Midnight Blue','#0a1330'],['graphite','Graphite','#2b2d30'],['forest','Forest','#2f7d44'],['sand','Warm Sand','#d9b57a'],['contrast','High Contrast','#000000']];
+const UNITS=[['in','Feet & Inches'],['mm','Millimeters']];
+const TOL=16, SEGPEN=10;
+const S={g:{...DEF},dims:[],pending:null,dimMode:false,polar:false,unit:'in',theme:'light',view:{s:1,x:0,y:0},hover:null,userNav:false,feat:null};
+const cv=$('cv'),svg=$('svg'),hudEl=$('hud'),errEl=$('err');
+const IN={H:$('iH'),W:$('iW'),C:$('iC'),R:$('iR'),F:$('iF'),M:$('iM')};
+const lastTxt={};
+
+/* ---------- Formatting / parsing ---------- */
+const Fmt={
+  len(v){
+    if(S.unit==='mm') return (Math.round(v*25.4*10)/10)+' mm';
+    let ts=Math.round(v*16); const sg=ts<0?'-':''; ts=Math.abs(ts);
+    const ft=Math.floor(ts/192), rem=ts%192, wi=Math.floor(rem/16); let n=rem%16,d=16;
+    while(n&&n%2===0){n/=2;d/=2;}
+    return sg+(ft?ft+"'-":'')+wi+(n?' '+n+'/'+d:'')+'"';
+  },
+  input(v){return S.unit==='mm'?String(+(v*25.4).toFixed(2)):String(+v.toFixed(4));},
+  parse(t){
+    t=t.trim(); if(!t) return NaN;
+    const num=/^[+]?(\d+\.?\d*|\.\d+)$/;
+    if(S.unit==='mm') return num.test(t)?parseFloat(t)/25.4:NaN;
+    const m=t.match(/^(\d+\.?\d*)\s*'\s*(?:-?\s*(\d+\.?\d*)\s*"?)?$/);
+    if(m) return parseFloat(m[1])*12+(m[2]?parseFloat(m[2]):0);
+    return num.test(t.replace(/"$/,''))?parseFloat(t):NaN;
+  }
+};
+
+/* ---------- Geometry ---------- */
+const Geo={
+  gap:(D,F,M,n)=>(D-2*F-n*M)/(n+1),
+  validate(g){
+    for(const k of ['W','H','F','M','C','R']) if(typeof g[k]!=='number'||!Number.isFinite(g[k])) return 'Invalid value for '+k+'.';
+    if(g.W<=0||g.H<=0) return 'Width and Height must be positive.';
+    if(g.F<=0||g.M<=0) return 'Frame Width and Middle Frame Width must be positive.';
+    if(!Number.isInteger(g.C)||!Number.isInteger(g.R)||g.C<0||g.R<0) return 'Column and Row must be whole numbers (0 or more).';
+    if(g.C>100||g.R>100) return 'Column and Row are limited to 100.';
+    const gx=this.gap(g.W,g.F,g.M,g.C), gy=this.gap(g.H,g.F,g.M,g.R);
+    if(!(gx>1e-9)) return 'Invalid layout: horizontal clear opening is not positive ('+Fmt.len(gx)+').';
+    if(!(gy>1e-9)) return 'Invalid layout: vertical clear opening is not positive ('+Fmt.len(gy)+').';
+    return null;
+  },
+  /* center = F + i*g + (i-0.5)*M, i from 1 */
+  centers(D,F,M,n){const g=this.gap(D,F,M,n);return Array.from({length:n},(_,k)=>{const i=k+1;return F+i*g+(i-0.5)*M;});},
+  build(g){
+    const {W,H,F,M}=g,h=M/2,vx=this.centers(W,F,M,g.C),hy=this.centers(H,F,M,g.R);
+    const ex=[0,F,W-F,W],ey=[0,F,H-F,H],cx=[F/2,W-F/2,W/2],cy=[F/2,H-F/2,H/2];
+    vx.forEach(c=>{ex.push(c-h,c+h);cx.push(c);}); hy.forEach(c=>{ey.push(c-h,c+h);cy.push(c);});
+    const segs=[],V=(x,y1,y2,kind)=>segs.push({a:[x,y1],b:[x,y2],kind}),Hh=(y,x1,x2,kind)=>segs.push({a:[x1,y],b:[x2,y],kind});
+    [0,W].forEach(x=>V(x,0,H,'edge'));[0,H].forEach(y=>Hh(y,0,W,'edge'));
+    [F,W-F].forEach(x=>V(x,F,H-F,'edge'));[F,H-F].forEach(y=>Hh(y,F,W-F,'edge'));
+    [F/2,W-F/2].forEach(x=>V(x,F/2,H-F/2,'center'));[F/2,H-F/2].forEach(y=>Hh(y,F/2,W-F/2,'center'));
+    vx.forEach(c=>{V(c-h,F,H-F,'edge');V(c+h,F,H-F,'edge');V(c,F,H-F,'center');});
+    hy.forEach(c=>{Hh(c-h,F,W-F,'edge');Hh(c+h,F,W-F,'edge');Hh(c,F,W-F,'center');});
+    const cxs=new Set(cx),cys=new Set(cy),pts=[];
+    const ux=[...new Set([...ex,...cx])],uy=[...new Set([...ey,...cy])];
+    for(const x of ux)for(const y of uy)pts.push({x,y,kind:(cxs.has(x)||cys.has(y))?'center':'edge'});
+    return {vx,hy,segs,pts,gx:this.gap(W,F,M,g.C),gy:this.gap(H,F,M,g.R)};
+  }
+};
+
+/* ---------- View (zoom / pan) ---------- */
+const View={
+  rect(){return cv.getBoundingClientRect();},
+  toW(sx,sy){const v=S.view;return {x:(sx-v.x)/v.s,y:(sy-v.y)/v.s};},
+  fit(){
+    const r=this.rect(); if(r.width<10||r.height<10) return;
+    const s=Math.max(0.05,Math.min((r.width-60)/S.g.W,(r.height-60)/S.g.H));
+    S.view={s,x:(r.width-S.g.W*s)/2,y:(r.height-S.g.H*s)/2}; S.userNav=false;
+  },
+  zoomAt(f,cx,cy){
+    const v=S.view,ns=Math.max(0.05,Math.min(500,v.s*f)),wx=(cx-v.x)/v.s,wy=(cy-v.y)/v.s;
+    S.view={s:ns,x:cx-wx*ns,y:cy-wy*ns}; S.userNav=true;
+  }
+};
+
+/* ---------- Snapping (screen-space tolerance -> world) ---------- */
+const Snap={
+  at(sx,sy){
+    const s=S.view.s,w=View.toW(sx,sy),tw=TOL/s;let best=null,bs=Infinity;
+    for(const p of S.feat.pts){
+      const dx=p.x-w.x;if(dx>tw||dx<-tw)continue;const dy=p.y-w.y;if(dy>tw||dy<-tw)continue;
+      const d=Math.hypot(dx,dy)*s;if(d<=TOL&&d<bs){bs=d;best={x:p.x,y:p.y,kind:p.kind};}
+    }
+    for(const sg of S.feat.segs){
+      const [ax,ay]=sg.a,[bx,by]=sg.b,ex=bx-ax,ey=by-ay,l2=ex*ex+ey*ey;
+      let u=((w.x-ax)*ex+(w.y-ay)*ey)/l2;u=Math.max(0,Math.min(1,u));
+      const qx=ax+u*ex,qy=ay+u*ey,raw=Math.hypot(qx-w.x,qy-w.y)*s;
+      if(raw<=TOL&&raw+SEGPEN<bs){bs=raw+SEGPEN;best={x:qx,y:qy,kind:sg.kind};}
+    }
+    return best;
+  },
+  /* Polar: constrain to 45° rays from first point, snapping to features lying on the ray */
+  polar(w,p1){
+    const vx=w.x-p1.x,vy=w.y-p1.y,th=Math.round(Math.atan2(-vy,vx)/(Math.PI/4))*Math.PI/4;
+    const d={x:Math.cos(th),y:-Math.sin(th)},t=Math.max(0,vx*d.x+vy*d.y),px=p1.x+d.x*t,py=p1.y+d.y*t;
+    let best={x:px,y:py,kind:'polar',th},bd=TOL/S.view.s;
+    const tryC=(x,y,kind)=>{const dd=Math.hypot(x-px,y-py);if(dd<=bd){bd=dd;best={x,y,kind,th};}};
+    for(const sg of S.feat.segs){
+      const ex=sg.b[0]-sg.a[0],ey=sg.b[1]-sg.a[1],den=d.x*ey-d.y*ex;if(Math.abs(den)<1e-9)continue;
+      const ax=sg.a[0]-p1.x,ay=sg.a[1]-p1.y,tt=(ax*ey-ay*ex)/den,u=(ax*d.y-ay*d.x)/den;
+      if(tt>1e-9&&u>=-1e-9&&u<=1+1e-9)tryC(p1.x+d.x*tt,p1.y+d.y*tt,sg.kind);
+    }
+    for(const p of S.feat.pts){
+      const cx=p.x-p1.x,cy=p.y-p1.y;
+      if(Math.abs(cx*d.y-cy*d.x)<1e-6&&cx*d.x+cy*d.y>1e-9)tryC(p.x,p.y,p.kind);
+    }
+    return best;
+  },
+  resolve(sx,sy){
+    const w=View.toW(sx,sy);
+    if(S.polar&&S.pending)return this.polar(w,S.pending);
+    return this.at(sx,sy)||{x:w.x,y:w.y,kind:'free'};
+  }
+};
+
+/* ---------- History ---------- */
+const Hist={
+  st:[],i:-1,
+  snap:()=>JSON.stringify({g:S.g,d:S.dims}),
+  push(){
+    const s=this.snap();if(this.st[this.i]===s){this.upd();return;}
+    this.st=this.st.slice(0,this.i+1);this.st.push(s);this.i++;
+    if(this.st.length>100){this.st.shift();this.i--;}
+    this.upd();
+  },
+  go(d){
+    const n=this.i+d;if(n<0||n>=this.st.length)return;
+    this.i=n;const o=JSON.parse(this.st[n]),sz=o.g.W!==S.g.W||o.g.H!==S.g.H;
+    S.g=o.g;S.dims=o.d;S.pending=null;S.hover=null;rebuild();syncInputs();showErr('');
+    if(sz||!S.userNav)View.fit();this.upd();render();
+  },
+  upd(){$('bUndo').disabled=this.i<=0;$('bRedo').disabled=this.i>=this.st.length-1;}
+};
+
+/* ---------- Dimensions ---------- */
+const Dim={
+  add(sx,sy){
+    const r=Snap.resolve(sx,sy),p={x:r.x,y:r.y};
+    if(!S.pending){S.pending=p;}
+    else{
+      if(Math.hypot(p.x-S.pending.x,p.y-S.pending.y)<1e-9)return;
+      S.dims.push({a:S.pending,b:p});S.pending=null;Hist.push();
+    }
+    S.hover=null;render();
+  },
+  angle(a,b){let d=Math.atan2(-(b.y-a.y),b.x-a.x)*180/Math.PI;if(d<0)d+=360;return d;}
+};
+
+/* ---------- Rendering ---------- */
+function gridStep(s){for(let k=-3;k<=6;k++)for(const m of [1,2,5]){const st=m*Math.pow(10,k);if(st*s>=9)return st;}return 1e6;}
+const KL={edge:'Edge',center:'Centerline',free:'Free',polar:'Polar'};
+function indicator(x,y,kind){
+  const c='var(--sn)';
+  if(kind==='center')return `<g stroke="${c}" stroke-width="2" fill="none"><circle cx="${x}" cy="${y}" r="7"/><path d="M${x-10} ${y}H${x+10}M${x} ${y-10}V${y+10}"/></g>`;
+  if(kind==='polar')return `<path d="M${x} ${y-8}L${x+8} ${y}L${x} ${y+8}L${x-8} ${y}Z" stroke="${c}" stroke-width="2" fill="none"/>`;
+  if(kind==='free')return `<path d="M${x-5} ${y-5}L${x+5} ${y+5}M${x+5} ${y-5}L${x-5} ${y+5}" stroke="${c}" stroke-width="1.5"/>`;
+  return `<rect x="${x-7}" y="${y-7}" width="14" height="14" stroke="${c}" stroke-width="2" fill="none"/>`;
+}
+function render(){
+  const r=View.rect(),w=r.width,h=r.height;if(!w||!h||!S.feat)return;
+  svg.setAttribute('viewBox',`0 0 ${w} ${h}`);
+  const {s,x:ox,y:oy}=S.view,{W,H,F,M}=S.g,{vx,hy}=S.feat,hm=M/2;
+  let o=`<rect width="${w}" height="${h}" fill="var(--cv)"/>`;
+  const st=gridStep(s),i0=Math.floor(-ox/s/st),i1=Math.ceil((w-ox)/s/st),j0=Math.floor(-oy/s/st),j1=Math.ceil((h-oy)/s/st);
+  let mn='',mj='';
+  for(let i=i0;i<=i1;i++){const X=(i*st*s+ox).toFixed(1),p=`M${X} 0V${h}`;if(i%5===0)mj+=p;else mn+=p;}
+  for(let j=j0;j<=j1;j++){const Y=(j*st*s+oy).toFixed(1),p=`M0 ${Y}H${w}`;if(j%5===0)mj+=p;else mn+=p;}
+  o+=`<path d="${mn}" stroke="var(--gm)" stroke-width="1" fill="none"/><path d="${mj}" stroke="var(--gM)" stroke-width="1" fill="none"/>`;
+  o+=`<g class="w" transform="translate(${ox} ${oy}) scale(${s})" stroke="var(--fl)" stroke-width="1.6" fill="var(--ff)">`
+    +`<rect x="${F}" y="${F}" width="${W-2*F}" height="${H-2*F}" fill="var(--gl)" stroke="none"/>`
+    +`<path d="M0 0H${W}V${H}H0ZM${F} ${F}H${W-F}V${H-F}H${F}Z" fill-rule="evenodd"/>`;
+  vx.forEach(c=>o+=`<rect x="${c-hm}" y="${F}" width="${M}" height="${H-2*F}"/>`);
+  hy.forEach(c=>o+=`<rect x="${F}" y="${c-hm}" width="${W-2*F}" height="${M}"/>`);
+  o+='</g>';
+  const sp=p=>[p.x*s+ox,p.y*s+oy];
+  for(const d of S.dims){
+    const [x1,y1]=sp(d.a),[x2,y2]=sp(d.b);
+    let rot=Math.atan2(y2-y1,x2-x1)*180/Math.PI;if(rot>90||rot<-90)rot+=180;
+    const dist=Math.hypot(d.b.x-d.a.x,d.b.y-d.a.y);
+    o+=`<g><line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--dm)" stroke-width="1.8"/>`
+      +`<circle cx="${x1}" cy="${y1}" r="3.5" fill="var(--dm)"/><circle cx="${x2}" cy="${y2}" r="3.5" fill="var(--dm)"/>`
+      +`<text transform="translate(${(x1+x2)/2} ${(y1+y2)/2}) rotate(${rot})" y="-8" text-anchor="middle" font-size="13" font-weight="700" fill="var(--dm)" stroke="var(--cv)" stroke-width="4" paint-order="stroke" font-family="system-ui,sans-serif">${Fmt.len(dist)}</text></g>`;
+  }
+  if(S.dimMode){
+    const hv=S.hover;
+    if(S.pending){
+      const [px,py]=sp(S.pending);
+      if(hv){
+        const [hx,hy2]=sp(hv);
+        if(S.polar&&hv.th!==undefined)o+=`<line x1="${px}" y1="${py}" x2="${px+Math.cos(hv.th)*4000}" y2="${py-Math.sin(hv.th)*4000}" stroke="var(--dm)" stroke-width="1" stroke-dasharray="3 5" opacity=".5"/>`;
+        o+=`<line x1="${px}" y1="${py}" x2="${hx}" y2="${hy2}" stroke="var(--dm)" stroke-width="1.5" stroke-dasharray="6 4"/>`;
+      }
+      o+=`<circle cx="${px}" cy="${py}" r="6" fill="var(--sn)" stroke="var(--dm)" stroke-width="2"/>`;
+    }
+    if(hv){const [hx,hy2]=sp(hv);o+=indicator(hx,hy2,hv.kind);}
+  }
+  svg.innerHTML=o;
+  let t='';
+  if(S.dimMode){
+    const hv=S.hover;t=(S.polar?'POLAR · ':'')+(S.pending?'Tap second point':'Tap first point');
+    if(S.pending&&hv)t+=` · ${Dim.angle(S.pending,hv).toFixed(1)}° · ${Fmt.len(Math.hypot(hv.x-S.pending.x,hv.y-S.pending.y))}`;
+    if(hv)t+=` · ${KL[hv.kind]}`;
+  }
+  hudEl.textContent=t;hudEl.style.display=t?'block':'none';
+}
+
+/* ---------- Inputs / validation ---------- */
+const NAMES={H:'Height',W:'Width',F:'Frame Width',M:'Middle Frame Width',C:'Column',R:'Row'};
+function showErr(m){errEl.textContent=m;errEl.style.display=m?'block':'none';}
+function syncInputs(){
+  for(const k in IN){IN[k].value=(k==='C'||k==='R')?String(S.g[k]):Fmt.input(S.g[k]);lastTxt[k]=IN[k].value;}
+  const u=S.unit==='mm'?'(mm)':'(in)';['H','W','F','M'].forEach(k=>$('u'+k).textContent=u);
+}
+function readInputs(){
+  const g={...S.g};
+  for(const k in IN){
+    const t=IN[k].value;if(t===lastTxt[k])continue;
+    const cnt=k==='C'||k==='R',v=cnt?(/^\d+$/.test(t.trim())?parseInt(t,10):NaN):Fmt.parse(t);
+    if(!Number.isFinite(v))return {err:NAMES[k]+': enter a valid '+(cnt?'whole number (0 or more).':'positive number.')};
+    g[k]=v;
+  }
+  return {g};
+}
+function onInput(commit){
+  const r=readInputs();if(r.err){showErr(r.err);return;}
+  const e=Geo.validate(r.g);if(e){showErr(e);return;}
+  showErr('');
+  for(const k in IN)lastTxt[k]=IN[k].value;
+  if(JSON.stringify(r.g)!==JSON.stringify(S.g)){
+    const sz=r.g.W!==S.g.W||r.g.H!==S.g.H;
+    S.g=r.g;S.dims=[];S.pending=null;S.hover=null;rebuild();if(sz||!S.userNav)View.fit();
+  }
+  render();if(commit)Hist.push();
+}
+function rebuild(){S.feat=Geo.build(S.g);}
+
+/* ---------- Settings / themes ---------- */
+function store(k,v){try{localStorage.setItem(k,v);}catch(e){}}
+function load(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+function applyTheme(t){S.theme=t;document.documentElement.dataset.theme=t;markOpts();}
+function setUnit(u){S.unit=u;store('cd_unit',u);syncInputs();markOpts();render();}
+function markOpts(){
+  document.querySelectorAll('#tOpts .btn').forEach(b=>b.classList.toggle('on',b.dataset.v===S.theme));
+  document.querySelectorAll('#uOpts .btn').forEach(b=>b.classList.toggle('on',b.dataset.v===S.unit));
+}
+UNITS.forEach(([v,n])=>{const b=document.createElement('button');b.className='btn';b.dataset.v=v;b.textContent=n;b.onclick=()=>setUnit(v);$('uOpts').appendChild(b);});
+THEMES.forEach(([v,n,c])=>{const b=document.createElement('button');b.className='btn';b.dataset.v=v;b.innerHTML=`<span class="dot" style="background:${c}"></span>${n}`;b.onclick=()=>{applyTheme(v);store('cd_theme',v);render();};$('tOpts').appendChild(b);});
+$('bSet').onclick=()=>$('set').classList.add('open');
+$('bClose').onclick=()=>$('set').classList.remove('open');
+$('set').addEventListener('pointerdown',e=>{if(e.target.id==='set')$('set').classList.remove('open');});
+
+/* ---------- Toolbar ---------- */
+function setDim(on){S.dimMode=on;S.pending=null;S.hover=null;$('bDim').classList.toggle('on',on);render();}
+$('bDim').onclick=()=>setDim(!S.dimMode);
+$('bPolar').onclick=()=>{S.polar=!S.polar;S.hover=null;$('bPolar').classList.toggle('on',S.polar);$('bPolar').textContent=S.polar?'Polar ON':'Polar OFF';render();};
+$('bReset').onclick=()=>{S.g={...DEF};S.dims=[];S.pending=null;S.hover=null;rebuild();syncInputs();showErr('');View.fit();Hist.push();render();};
+$('bUndo').onclick=()=>Hist.go(-1);
+$('bRedo').onclick=()=>Hist.go(1);
+const zc=()=>{const r=View.rect();return [r.width/2,r.height/2];};
+$('zIn').onclick=()=>{View.zoomAt(1.4,...zc());render();};
+$('zOut').onclick=()=>{View.zoomAt(1/1.4,...zc());render();};
+$('zFit').onclick=()=>{View.fit();render();};
+for(const k in IN){IN[k].addEventListener('input',()=>onInput(false));IN[k].addEventListener('change',()=>onInput(true));}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){if(S.pending){S.pending=null;S.hover=null;render();}else if(S.dimMode)setDim(false);}
+});
+
+/* ---------- Pointer gestures ---------- */
+const P=new Map();let tap=null,pan=null,pinch=null,multi=false;
+const pos=e=>{const r=View.rect();return {x:e.clientX-r.left,y:e.clientY-r.top};};
+const pdist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+cv.addEventListener('contextmenu',e=>e.preventDefault());
+cv.addEventListener('wheel',e=>{e.preventDefault();const p=pos(e);View.zoomAt(Math.exp(-e.deltaY*(e.deltaMode===1?0.05:0.0015)),p.x,p.y);render();},{passive:false});
+cv.addEventListener('pointerdown',e=>{
+  if(e.target.closest('.zc'))return;
+  try{cv.setPointerCapture(e.pointerId);}catch(_){}
+  const p=pos(e);P.set(e.pointerId,p);
+  if(P.size===1){
+    tap={id:e.pointerId,x:p.x,y:p.y,t:performance.now(),moved:false};pan={x:S.view.x,y:S.view.y};
+    if(S.dimMode){S.hover=Snap.resolve(p.x,p.y);render();}
+  }else{
+    multi=true;tap=null;const [a,b]=[...P.values()];
+    pinch={d:pdist(a,b)||1,mx:(a.x+b.x)/2,my:(a.y+b.y)/2,s:S.view.s,x:S.view.x,y:S.view.y};S.hover=null;render();
+  }
+});
+cv.addEventListener('pointermove',e=>{
+  const p=pos(e);
+  if(!P.has(e.pointerId)){if(e.pointerType==='mouse'&&S.dimMode){S.hover=Snap.resolve(p.x,p.y);render();}return;}
+  P.set(e.pointerId,p);
+  if(P.size>=2&&pinch){
+    const [a,b]=[...P.values()],d=pdist(a,b)||1,mx=(a.x+b.x)/2,my=(a.y+b.y)/2;
+    const ns=Math.max(0.05,Math.min(500,pinch.s*d/pinch.d)),wx=(pinch.mx-pinch.x)/pinch.s,wy=(pinch.my-pinch.y)/pinch.s;
+    S.view={s:ns,x:mx-wx*ns,y:my-wy*ns};S.userNav=true;render();return;
+  }
+  if(tap&&tap.id===e.pointerId){
+    const dx=p.x-tap.x,dy=p.y-tap.y;
+    if(!tap.moved&&Math.hypot(dx,dy)>8)tap.moved=true;
+    if(tap.moved){S.view={s:S.view.s,x:pan.x+dx,y:pan.y+dy};S.userNav=true;S.hover=null;render();}
+    else if(S.dimMode){S.hover=Snap.resolve(p.x,p.y);render();}
+  }
+});
+function endPtr(e){
+  if(!P.has(e.pointerId))return;
+  const p=pos(e);P.delete(e.pointerId);
+  if(e.type==='pointerup'&&tap&&tap.id===e.pointerId&&!tap.moved&&!multi&&S.dimMode&&performance.now()-tap.t<700)Dim.add(p.x,p.y);
+  if(tap&&tap.id===e.pointerId)tap=null;
+  if(P.size===0){multi=false;pinch=null;if(e.pointerType!=='mouse')S.hover=null;render();}
+  else if(P.size===1)pinch=null;
+}
+cv.addEventListener('pointerup',endPtr);
+cv.addEventListener('pointercancel',endPtr);
+
+/* ---------- Init ---------- */
+const sT=load('cd_theme'),sU=load('cd_unit');
+if(sU==='in'||sU==='mm')S.unit=sU;
+applyTheme(THEMES.some(t=>t[0]===sT)?sT:'light');
+rebuild();syncInputs();markOpts();Hist.push();
+new ResizeObserver(()=>{if(!S.userNav)View.fit();render();}).observe(cv);
+View.fit();render();
+console.assert(Math.abs(Geo.gap(48,2,2,2)-40/3)<1e-9&&Geo.gap(72,2,2,1)===33,'Reference geometry check failed');
+})();
+</script>
+</body>
+</html>
